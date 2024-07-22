@@ -1,6 +1,8 @@
 <?php
 
+use App\Http\Controllers\CommentController;
 use App\Http\Controllers\TaskController;
+use App\Http\Controllers\TeamController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
@@ -19,7 +21,7 @@ use App\Http\Controllers\AuthController;
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 Route::middleware('auth:sanctum')->post('/logout', [AuthController::class, 'logout']);
-// TaskController routes beginning
+
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/tasks', [TaskController::class, 'index']);
     Route::post('/tasks', [TaskController::class, 'store']);
@@ -27,4 +29,16 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::put('/tasks/{id}', [TaskController::class, 'update']);
     Route::delete('/tasks/{id}', [TaskController::class, 'destroy']);
 });
-// TaskController routes end
+
+Route::middleware('auth:sanctum')->group(function () {
+    Route::post('/tasks/{taskId}/comments', [CommentController::class, 'store']);
+    Route::get('/tasks/{taskId}/comments', [CommentController::class, 'index']);
+    Route::delete('/comments/{id}', [CommentController::class, 'destroy']);
+});
+
+Route::middleware('auth:sanctum')->group(function () {
+    Route::post('/teams', [TeamController::class, 'store']);
+    Route::get('/teams', [TeamController::class, 'index']);
+    Route::post('/teams/{teamId}/users', [TeamController::class, 'addUser']);
+    Route::delete('/teams/{teamId}/users/{userId}', [TeamController::class, 'removeUser']);
+});
