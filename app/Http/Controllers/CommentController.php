@@ -34,6 +34,6 @@ class CommentController extends Controller
         $comment = Comment::where('user_id', Auth::id())->findOrFail($id);
         $comment->delete();
 
-        return response()->json(['message' => 'Comment deleted successfully']);
+        return response()->json(['message' => 'Комент було видалено успішноє']);
     }
 }
