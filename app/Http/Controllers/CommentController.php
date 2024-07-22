@@ -24,7 +24,7 @@ class CommentController extends Controller
     public function store(CommentRequest $request, Task $task): CommentResource
     {
         $data = [
-            'content' => $request->content,
+            'content' => $request->input('content'),
             'user_id' => $request->user()->id,
             'task_id' => $task->id,
         ];
@@ -48,9 +48,9 @@ class CommentController extends Controller
                 throw new ModelNotFoundException();
             }
             $this->commentRepository->delete($comment);
-            return response()->json(['message' => 'Comment deleted successfully'], Response::HTTP_OK);
+            return new JsonResponse(['message' => 'Comment deleted successfully'], Response::HTTP_OK);
         } catch (ModelNotFoundException $e) {
-            return response()->json(['message' => 'Comment not found'], Response::HTTP_NOT_FOUND);
+            return new JsonResponse(['message' => 'Comment not found'], Response::HTTP_NOT_FOUND);
         }
     }
 }

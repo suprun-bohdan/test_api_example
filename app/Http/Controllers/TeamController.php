@@ -15,7 +15,7 @@ use Symfony\Component\HttpFoundation\Response;
 
 class TeamController extends Controller
 {
-    protected $teamRepository;
+    protected TeamRepository $teamRepository;
 
     public function __construct(TeamRepository $teamRepository)
     {
@@ -49,27 +49,27 @@ class TeamController extends Controller
     public function destroy(Team $team): JsonResponse
     {
         $this->teamRepository->delete($team);
-        return response()->json(null, Response::HTTP_NO_CONTENT);
+        return new JsonResponse(null, Response::HTTP_NO_CONTENT);
     }
 
     public function addUser(TeamUserRequest $request, Team $team): JsonResponse
     {
         if ($this->teamRepository->userExistsInTeam($team->id, $request->user_id)) {
-            return response()->json(['message' => 'User already in the team'], Response::HTTP_CONFLICT);
+            return new JsonResponse(['message' => 'User already in the team'], Response::HTTP_CONFLICT);
         }
 
         $this->teamRepository->addUserToTeam($team->id, $request->user_id);
         $user = $team->users()->find($request->user_id);
-        return response()->json(['message' => 'User added to the team', 'user' => new UserResource($user)], Response::HTTP_OK);
+        return new JsonResponse(['message' => 'User added to the team', 'user' => new UserResource($user)], Response::HTTP_OK);
     }
 
     public function removeUser(Team $team, int $userId): JsonResponse
     {
         if (!$team->users()->where('user_id', $userId)->exists()) {
-            return response()->json(['message' => 'User not found in the team'], Response::HTTP_NOT_FOUND);
+            return new JsonResponse(['message' => 'User not found in the team'], Response::HTTP_NOT_FOUND);
         }
 
         $team->users()->detach($userId);
-        return response()->json(['message' => 'User removed from the team'], Response::HTTP_OK);
+        return new JsonResponse(['message' => 'User removed from the team'], Response::HTTP_OK);
     }
 }

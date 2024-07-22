@@ -28,7 +28,7 @@ class AuthController extends Controller
             'password' => Hash::make($request->password),
         ]);
 
-        return response()->json($user, Response::HTTP_CREATED);
+        return new JsonResponse($user, Response::HTTP_CREATED);
     }
 
     /**
@@ -46,13 +46,13 @@ class AuthController extends Controller
 
         $token = $user->createToken('auth_token')->plainTextToken;
 
-        return response()->json(['access_token' => $token, 'token_type' => 'Bearer']);
+        return new JsonResponse(['access_token' => $token, 'token_type' => 'Bearer']);
     }
 
     public function logout(Request $request): JsonResponse
     {
         $request->user()->tokens()->delete();
 
-        return response()->json(['message' => 'Successfully logged out'], Response::HTTP_OK);
+        return new JsonResponse(['message' => 'Successfully logged out'], Response::HTTP_OK);
     }
 }

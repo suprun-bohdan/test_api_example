@@ -50,6 +50,6 @@ class TaskController extends Controller
     {
         $task = $this->taskRepository->findById($id);
         $this->taskRepository->delete($task);
-        return response()->json(null, Response::HTTP_NO_CONTENT);
+        return new JsonResponse(null, Response::HTTP_NO_CONTENT);
     }
 }
