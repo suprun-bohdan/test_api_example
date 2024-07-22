@@ -8,7 +8,7 @@ class TaskRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return true;
+        return auth()->user()?->role === 'admin';
     }
 
     public function rules(): array
