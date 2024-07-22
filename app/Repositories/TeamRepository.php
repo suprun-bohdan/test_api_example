@@ -5,6 +5,10 @@ namespace App\Repositories;
 use App\Models\Team;
 use Illuminate\Database\Eloquent\Collection;
 
+/**
+ * @method update(Team $team, mixed $validated)
+ * @method all()
+ */
 class TeamRepository
 {
     public function create(array $data): Team
@@ -27,7 +31,6 @@ class TeamRepository
     public function delete(Team $team): bool
     {
         $team->users()->detach();
-
         return $team->delete();
     }
 

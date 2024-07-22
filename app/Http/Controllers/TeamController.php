@@ -2,21 +2,20 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Team;
+use Illuminate\Http\Request;
 use App\Http\Requests\TeamRequest;
 use App\Http\Requests\TeamUserRequest;
-use App\Models\Team;
 use App\Http\Resources\TeamResource;
 use App\Http\Resources\UserResource;
 use App\Repositories\TeamRepository;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Symfony\Component\HttpFoundation\Response;
 
 class TeamController extends Controller
 {
-    protected TeamRepository $teamRepository;
+    protected $teamRepository;
 
     public function __construct(TeamRepository $teamRepository)
     {
@@ -36,6 +35,23 @@ class TeamController extends Controller
         return new TeamResource($team);
     }
 
+    public function show(Team $team): TeamResource
+    {
+        return new TeamResource($team);
+    }
+
+    public function update(TeamRequest $request, Team $team): TeamResource
+    {
+        $this->teamRepository->update($team, $request->validated());
+        return new TeamResource($team);
+    }
+
+    public function destroy(Team $team): JsonResponse
+    {
+        $this->teamRepository->delete($team);
+        return response()->json(null, Response::HTTP_NO_CONTENT);
+    }
+
     public function addUser(TeamUserRequest $request, Team $team): JsonResponse
     {
         if ($this->teamRepository->userExistsInTeam($team->id, $request->user_id)) {
@@ -47,37 +63,13 @@ class TeamController extends Controller
         return response()->json(['message' => 'User added to the team', 'user' => new UserResource($user)], Response::HTTP_OK);
     }
 
-    public function removeUser(Request $request, Team $team, int $userId): JsonResponse
+    public function removeUser(Team $team, int $userId): JsonResponse
     {
         if (!$team->users()->where('user_id', $userId)->exists()) {
             return response()->json(['message' => 'User not found in the team'], Response::HTTP_NOT_FOUND);
         }
 
         $team->users()->detach($userId);
-
         return response()->json(['message' => 'User removed from the team'], Response::HTTP_OK);
-    }
-
-    public function destroy(Request $request, Team $team): JsonResponse
-    {
-        try {
-            $team = $this->teamRepository->findById($team->id);
-
-            if (!$team) {
-                return response()->json(['message' => 'Team not found.'], Response::HTTP_NOT_FOUND);
-            }
-
-            if (!$team->users()->where('user_id', $request->user()->id)->exists()) {
-                return response()->json(['message' => 'You are not a member of this team.'], Response::HTTP_FORBIDDEN);
-            }
-
-            $team->users()->detach();
-            $this->teamRepository->delete($team);
-
-            return response()->json(['message' => 'Team and all its users have been deleted successfully.'], Response::HTTP_OK);
-
-        } catch (ModelNotFoundException $e) {
-            return response()->json(['message' => 'Team not found.'], Response::HTTP_NOT_FOUND);
-        }
     }
 }
