@@ -12,4 +12,16 @@ use Illuminate\Database\Eloquent\Model;
 class Task extends Model
 {
     use HasFactory;
+
+    public function comments(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(Comment::class);
+    }
+
+    protected $fillable = [
+        'title',
+        'description',
+        'status',
+        'user_id'
+    ];
 }

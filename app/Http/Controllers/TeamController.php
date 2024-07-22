@@ -21,7 +21,9 @@ class TeamController extends Controller
 
     public function index()
     {
-        return Auth::user()->teams;
+        if (isset(Auth::user()->teams)) {
+            return Auth::user()->teams;
+        }
     }
 
     public function addUser(Request $request, $teamId): \Illuminate\Http\JsonResponse
@@ -30,10 +32,15 @@ class TeamController extends Controller
 
         $request->validate(['user_id' => 'required|exists:users,id']);
 
+        if ($team->users()->where('user_id', $request->user_id)->exists()) {
+            return response()->json(['message' => "Ви уже в команді ID: {$teamId}"], 400);
+        }
+
         $team->users()->attach($request->user_id);
 
-        return response()->json(['message' => 'Корситувача було додано до команди.']);
+        return response()->json(['message' => 'Користувача було додано до команди.']);
     }
+
 
     public function removeUser($teamId, $userId): \Illuminate\Http\JsonResponse
     {

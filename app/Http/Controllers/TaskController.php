@@ -54,9 +54,14 @@ class TaskController extends Controller
 
     public function destroy($id): \Illuminate\Http\JsonResponse
     {
-        $task = Task::where('user_id', Auth::id())->findOrFail($id);
+        $task = Task::where('user_id', Auth::id())->find($id);
+
+        if (!$task) {
+            return response()->json(['message' => 'Такого завдання не було знайдено'], 404);
+        }
+
         $task->delete();
 
-        return response()->json(['message' => 'Task deleted successfully']);
+        return response()->json(['message' => 'Завдання успішно видалено']);
     }
 }

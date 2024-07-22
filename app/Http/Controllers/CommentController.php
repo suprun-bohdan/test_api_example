@@ -13,7 +13,9 @@ class CommentController extends Controller
     {
         $request->validate(['content' => 'required|string']);
 
-        $task = Task::where('user_id', Auth::id())->findOrFail($taskId);
+        $task = Task::where('id', $taskId)
+            ->where('user_id', Auth::id())
+            ->firstOrFail();
 
         $comment = $task->comments()->create([
             'content' => $request->content,
@@ -25,15 +27,27 @@ class CommentController extends Controller
 
     public function index($taskId): \Illuminate\Http\JsonResponse
     {
-        $task = Task::where('user_id', Auth::id())->findOrFail($taskId);
-        return response()->json($task->comments);
+        $task = Task::find($taskId);
+
+        if (!$task) {
+            return response()->json("Завдання не знайдено", 404);
+        }
+
+        $comments = Comment::where('task_id', $taskId)->get();
+
+        if ($comments->isEmpty()) {
+            return response()->json("Коментарів до завдання {$task->title} (ID: {$taskId}) немає", 404);
+        } else {
+            return response()->json($comments);
+        }
     }
+
 
     public function destroy($id): \Illuminate\Http\JsonResponse
     {
         $comment = Comment::where('user_id', Auth::id())->findOrFail($id);
         $comment->delete();
 
-        return response()->json(['message' => 'Комент було видалено успішноє']);
+        return response()->json(['message' => 'Комент було видалено успішно']);
     }
 }

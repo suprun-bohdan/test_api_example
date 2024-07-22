@@ -26,6 +26,11 @@ class User extends Authenticatable
         'password',
     ];
 
+    public function teams(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
+    {
+        return $this->belongsToMany(Team::class);
+    }
+
     /**
      * The attributes that should be hidden for serialization.
      *
