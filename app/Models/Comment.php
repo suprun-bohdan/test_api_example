@@ -4,19 +4,30 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
- * @method static where(string $string, $id)
- * @method static whereHas(string $string, \Closure $param)
+ * @method static create(array $data)
+ * @method static find(int $id)
+ * @method static where(string $string, int $taskId)
  */
 class Comment extends Model
 {
     use HasFactory;
 
-    public function task(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    protected $fillable = [
+        'content',
+        'task_id',
+        'user_id',
+    ];
+
+    public function task(): BelongsTo
     {
         return $this->belongsTo(Task::class);
     }
 
-    protected $fillable = ['content', 'user_id', 'task_id'];
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
+    }
 }

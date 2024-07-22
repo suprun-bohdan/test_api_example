@@ -167,7 +167,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"title\": \"Оновлене завдання\",\r\n    \"description\": \"Опис завдання\",\r\n    \"status\": \"in_progress\"\r\n}",
+							"raw": "{\r\n    \"title\": \"Оновлене завдання 7\",\r\n    \"description\": \"Опис завдання\",\r\n    \"status\": \"in_progress\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -361,14 +361,14 @@
 							}
 						},
 						"url": {
-							"raw": "{{base_url}}/api/comments/{{comment_id}}",
+							"raw": "{{base_url}}/api/comments/4",
 							"host": [
 								"{{base_url}}"
 							],
 							"path": [
 								"api",
 								"comments",
-								"{{comment_id}}"
+								"4"
 							]
 						}
 					},
@@ -413,15 +413,13 @@
 							}
 						},
 						"url": {
-							"raw": "{{base_url}}/api/tasks/{{task_id}}/comments",
+							"raw": "{{base_url}}/api/teams",
 							"host": [
 								"{{base_url}}"
 							],
 							"path": [
 								"api",
-								"tasks",
-								"{{task_id}}",
-								"comments"
+								"teams"
 							]
 						}
 					},
@@ -450,7 +448,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"user_id\": 1\r\n}",
+							"raw": "{\r\n    \"user_id\": 2\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -503,7 +501,7 @@
 							}
 						},
 						"url": {
-							"raw": "{{base_url}}/api/teams/{{team_id}}/users/{{user_id}}",
+							"raw": "{{base_url}}/api/teams/{{team_id}}/users/2",
 							"host": [
 								"{{base_url}}"
 							],
@@ -512,7 +510,7 @@
 								"teams",
 								"{{team_id}}",
 								"users",
-								"{{user_id}}"
+								"2"
 							]
 						}
 					},
@@ -592,14 +590,14 @@
 							}
 						},
 						"url": {
-							"raw": "{{base_url}}/api/comments/{{comment_id}}",
+							"raw": "{{base_url}}/api/teams/{{team_id}}",
 							"host": [
 								"{{base_url}}"
 							],
 							"path": [
 								"api",
-								"comments",
-								"{{comment_id}}"
+								"teams",
+								"{{team_id}}"
 							]
 						}
 					},
@@ -623,7 +621,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n    \"name\": \"Bohdan Suprun\",\r\n    \"email\": \"bohdan.suprun@outlook.com\",\r\n    \"password\": \"qwerty\"\r\n}",
+					"raw": "{\r\n    \"name\": \"Bohdan Suprun\",\r\n    \"email\": \"bohdan.suprun@outlook.com\",\r\n    \"password\": \"qwerty123456\"\r\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -659,7 +657,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n    \"email\": \"bohdan.suprun@outlook.com\",\r\n    \"password\": \"qwerty\"\r\n}",
+					"raw": "{\r\n    \"email\": \"bohdan.suprun@outlook.com\",\r\n    \"password\": \"qwerty123456\"\r\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -678,6 +676,35 @@
 				}
 			},
 			"response": []
+		},
+		{
+			"name": "Logout",
+			"protocolProfileBehavior": {
+				"disabledSystemHeaders": {
+					"accept": true
+				}
+			},
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "default"
+					}
+				],
+				"url": {
+					"raw": "{{base_url}}/api/logout",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"api",
+						"logout"
+					]
+				}
+			},
+			"response": []
 		}
 	],
 	"auth": {
@@ -685,7 +712,7 @@
 		"bearer": [
 			{
 				"key": "token",
-				"value": "1|JZza6X3P9FGMd900fRChuK2DyFVFipI54M5fSMf8da67ed9c",
+				"value": "3|70rBrqriY5clOvrmz3cMPU28LmmPuuqjvmjR3R8rf9460011",
 				"type": "string"
 			}
 		]
@@ -718,7 +745,7 @@
 		},
 		{
 			"key": "auth_token",
-			"value": "1|JZza6X3P9FGMd900fRChuK2DyFVFipI54M5fSMf8da67ed9c",
+			"value": "3|70rBrqriY5clOvrmz3cMPU28LmmPuuqjvmjR3R8rf9460011",
 			"type": "default"
 		},
 		{
