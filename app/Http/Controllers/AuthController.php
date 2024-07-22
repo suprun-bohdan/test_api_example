@@ -2,57 +2,57 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\User;
+use App\Repositories\UserRepository;
+use App\Http\Requests\RegisterRequest;
+use App\Http\Requests\LoginRequest;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
+use Symfony\Component\HttpFoundation\Response;
 
 class AuthController extends Controller
 {
-    public function register(Request $request): \Illuminate\Http\JsonResponse
-    {
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users',
-            'password' => 'required|string|min:4',
-        ]);
+    protected UserRepository $userRepository;
 
-        $user = User::create([
+    public function __construct(UserRepository $userRepository)
+    {
+        $this->userRepository = $userRepository;
+    }
+
+    public function register(RegisterRequest $request): JsonResponse
+    {
+        $user = $this->userRepository->create([
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
         ]);
 
-        return response()->json(['message' => 'Користувач успішно зареєстрований']);
-
+        return response()->json($user, Response::HTTP_CREATED);
     }
 
     /**
      * @throws ValidationException
      */
-    public function login(Request $request)
+    public function login(LoginRequest $request): JsonResponse
     {
-        $request->validate([
-            'email' => 'required|string|email|max:255',
-            'password' => 'required|string|min:4',
-        ]);
+        $user = $this->userRepository->findByEmail($request->email);
 
-        $user = User::where('email', $request->email)->first();
         if (!$user || !Hash::check($request->password, $user->password)) {
             throw ValidationException::withMessages([
-                'email' => ['Креди не вірні.'],
+                'email' => ['The provided credentials are incorrect.'],
             ]);
         }
 
         $token = $user->createToken('auth_token')->plainTextToken;
 
-        return response()->json(['token' => $token, 'token_type' => 'Bearer']);
+        return response()->json(['access_token' => $token, 'token_type' => 'Bearer']);
     }
 
-    public function logout(Request $request): \Illuminate\Http\JsonResponse
+    public function logout(Request $request): JsonResponse
     {
         $request->user()->tokens()->delete();
 
-        return response()->json(['message' => 'Ви успішно розлогінились']);
+        return response()->json(['message' => 'Successfully logged out'], Response::HTTP_OK);
     }
 }

@@ -2,52 +2,57 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Comment;
+use App\Http\Requests\CommentRequest;
 use App\Models\Task;
+use App\Http\Resources\CommentResource;
+use App\Repositories\CommentRepository;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
+use Symfony\Component\HttpFoundation\Response;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class CommentController extends Controller
 {
-    public function store(Request $request, $taskId): \Illuminate\Http\JsonResponse
+    protected CommentRepository $commentRepository;
+
+    public function __construct(CommentRepository $commentRepository)
     {
-        $request->validate(['content' => 'required|string']);
+        $this->commentRepository = $commentRepository;
+    }
 
-        $task = Task::where('id', $taskId)
-            ->where('user_id', Auth::id())
-            ->firstOrFail();
-
-        $comment = $task->comments()->create([
+    public function store(CommentRequest $request, Task $task): CommentResource
+    {
+        $data = [
             'content' => $request->content,
-            'user_id' => Auth::id(),
-        ]);
+            'user_id' => $request->user()->id,
+            'task_id' => $task->id,
+        ];
+        $comment = $this->commentRepository->create($data);
 
-        return response()->json($comment, 201);
+        return new CommentResource($comment);
     }
 
-    public function index($taskId): \Illuminate\Http\JsonResponse
+    public function index(Task $task): AnonymousResourceCollection
     {
-        $task = Task::find($taskId);
+        $comments = $this->commentRepository->findByTaskId($task->id);
 
-        if (!$task) {
-            return response()->json("Завдання не знайдено", 404);
-        }
-
-        $comments = Comment::where('task_id', $taskId)->get();
-
-        if ($comments->isEmpty()) {
-            return response()->json("Коментарів до завдання {$task->title} (ID: {$taskId}) немає", 404);
-        } else {
-            return response()->json($comments);
-        }
+        return CommentResource::collection($comments);
     }
 
-
-    public function destroy($id): \Illuminate\Http\JsonResponse
+    public function destroy(int $id): JsonResponse
     {
-        $comment = Comment::where('user_id', Auth::id())->findOrFail($id);
-        $comment->delete();
-
-        return response()->json(['message' => 'Комент було видалено успішно']);
+        try {
+            $comment = $this->commentRepository->findById($id);
+            if (!$comment) {
+                throw new ModelNotFoundException();
+            }
+            $this->commentRepository->delete($comment);
+            return response()->json(['message' => 'Comment deleted successfully'], Response::HTTP_OK);
+        } catch (ModelNotFoundException $e) {
+            return response()->json(['message' => 'Comment not found'], Response::HTTP_NOT_FOUND);
+        }
     }
 }
+
+

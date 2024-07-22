@@ -2,66 +2,54 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\TaskRequest;
 use App\Models\Task;
+use App\Http\Resources\TaskResource;
+use App\Repositories\TaskRepository;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
+use Symfony\Component\HttpFoundation\Response;
 
 class TaskController extends Controller
 {
-    public function index()
+    protected TaskRepository $taskRepository;
+
+    public function __construct(TaskRepository $taskRepository)
     {
-        return Task::where('user_id', Auth::id())->get();
+        $this->taskRepository = $taskRepository;
     }
 
-    public function store(Request $request): \Illuminate\Http\JsonResponse
+    public function index(Request $request): AnonymousResourceCollection
     {
-        $request->validate([
-            'title' => 'required|string|max:255',
-            'description' => 'nullable|string',
-            'status' => 'required|string|in:pending,in_progress,completed',
-        ]);
+        $tasks = $this->taskRepository->findByUserId($request->user()->id);
 
-        $task = Task::create([
-            'title' => $request->title,
-            'description' => $request->description,
-            'status' => $request->status,
-            'user_id' => Auth::id(),
-        ]);
-
-        return response()->json($task, 201);
+        return TaskResource::collection($tasks);
     }
 
-    public function show($id): \Illuminate\Http\JsonResponse
+    public function store(TaskRequest $request): TaskResource
     {
-        $task = Task::where('user_id', Auth::id())->findOrFail($id);
-        return response()->json($task);
+        $task = $this->taskRepository->create($request->validated() + ['user_id' => $request->user()->id]);
+        return new TaskResource($task);
     }
 
-    public function update(Request $request, $id): \Illuminate\Http\JsonResponse
+    public function show($id): TaskResource
     {
-        $task = Task::where('user_id', Auth::id())->findOrFail($id);
-
-        $request->validate([
-            'title' => 'sometimes|required|string|max:255',
-            'description' => 'sometimes|nullable|string',
-            'status' => 'sometimes|required|string|in:pending,in_progress,completed',
-        ]);
-
-        $task->update($request->only('title', 'description', 'status'));
-
-        return response()->json($task);
+        $task = $this->taskRepository->findById($id);
+        return new TaskResource($task);
     }
 
-    public function destroy($id): \Illuminate\Http\JsonResponse
+    public function update(TaskRequest $request, int $id): TaskResource
     {
-        $task = Task::where('user_id', Auth::id())->find($id);
+        $task = $this->taskRepository->findById($id);
+        $this->taskRepository->update($task, $request->validated());
+        return new TaskResource($task);
+    }
 
-        if (!$task) {
-            return response()->json(['message' => 'Такого завдання не було знайдено'], 404);
-        }
-
-        $task->delete();
-
-        return response()->json(['message' => 'Завдання успішно видалено']);
+    public function destroy($id): JsonResponse
+    {
+        $task = $this->taskRepository->findById($id);
+        $this->taskRepository->delete($task);
+        return response()->json(null, Response::HTTP_NO_CONTENT);
     }
 }
