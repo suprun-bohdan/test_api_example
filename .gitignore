@@ -1,0 +1,98 @@
+# ============================================================
+# Laravel / PHP .gitignore  (ready to use)
+# ------------------------------------------------------------
+# Copy this file into a repository root as `.gitignore`.
+# Rule of thumb: never commit secrets, dependencies or build
+# artifacts. Everything here is reproducible or machine-local.
+# ============================================================
+
+# ---------- Environment & secrets (SECURITY-CRITICAL) -------
+.env
+.env.*
+!.env.example
+!.env.testing.example
+
+# Keys, certs and credentials
+*.pem
+*.key
+*.crt
+*.p12
+*.pfx
+*.jks
+*.keystore
+secrets/
+credentials.*
+*.p8
+
+# ---------- PHP / Composer / Laravel -----------------------
+/vendor
+composer.phar
+# NOTE: for applications you SHOULD commit composer.lock (do not ignore it).
+#       for reusable libraries you may ignore it.
+
+# Laravel runtime & storage
+/public/hot
+/public/storage
+/storage/*.key
+/storage/framework/cache/data/*
+/storage/framework/sessions/*
+/storage/framework/testing/*
+/storage/framework/views/*
+/storage/logs/*
+!/storage/framework/cache/data/.gitignore
+!/storage/framework/sessions/.gitignore
+!/storage/framework/testing/.gitignore
+!/storage/framework/views/.gitignore
+!/storage/logs/.gitignore
+.phpunit.result.cache
+.phpunit.cache
+.php-cs-fixer.cache
+/.phpactor.json
+
+# ---------- Node / frontend build --------------------------
+/node_modules
+/public/build
+/public/css
+/public/js
+/public/mix-manifest.json
+npm-debug.log
+yarn-error.log
+.pnpm-debug.log
+
+# ---------- IDE / editor -----------------------------------
+.idea/
+.vscode/
+*.iml
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.swp
+*~
+.phpstorm.meta.php
+_ide_helper.php
+_ide_helper_models.php
+*.sublime-workspace
+
+# ---------- OS / misc --------------------------------------
+.DS_Store
+Thumbs.db
+*.log
+*.local
+.history/
+
+# ---------- Archives & dumps (never commit these) ----------
+*.zip
+*.tar
+*.tar.gz
+*.tgz
+*.sql
+*.sql.gz
+*.dump
+dump.sql
+
+# ---------- Local dev tooling ------------------------------
+docker-compose.override.yml
+Homestead.json
+Homestead.yaml
+.phpunit.result.cache
